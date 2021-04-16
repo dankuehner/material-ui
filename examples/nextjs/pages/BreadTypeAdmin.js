@@ -6,28 +6,6 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
 class BreadTypeAdmin extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {breadTypes: []};
-
-		this.addNewBreadType = this.addNewBreadType.bind(this);
-		this.dropBreadType = this.dropBreadType.bind(this);
-	}
-
-	addNewBreadType(newBreadType) {
-		let newBreadTypeList = [...this.state.breadTypes, newBreadType];
-		this.setState({ breadTypes: newBreadTypeList });
-		this.props.onBreadListChange(newBreadTypeList);
-	}
-
-	dropBreadType(droppedBreadType) {
-		let filteredBreadTypeList = this.state.breadTypes.filter(
-			breadType => breadType !== droppedBreadType
-		);
-		this.setState({ breadTypes: filteredBreadTypeList });
-		this.props.onBreadListChange(filteredBreadTypeList);
-	}
-
 	render() {
 		return (
 			<Box m={2}>
@@ -35,8 +13,8 @@ class BreadTypeAdmin extends React.Component {
 					Types of Bread
 				</Typography>
 				<form>
-					<BreadTypeList breadTypes={this.state.breadTypes} onDropBreadType={this.dropBreadType} />
-					<AddNewBread onNewBreadType={this.addNewBreadType} />
+					<BreadTypeList breadTypes={this.props.breadTypes} onDropBreadType={this.props.onDropBreadType} />
+					<AddNewBread onNewBreadType={this.props.onAddNewBreadType} />
 				</form>
 			</Box>
 		);
@@ -63,8 +41,6 @@ class BreadTypeListItem extends React.Component {
 	}
 	
 	handleDropClick() {
-		if (!confirm('Are you sure?  This could cause instability if this bread type has been added to any orders!')) return;
-
 		this.props.onDropBreadType(this.props.breadName);
 	}
 	
@@ -72,7 +48,7 @@ class BreadTypeListItem extends React.Component {
 		return (
 			<Grid item xs={12}>
 				{this.props.breadName} 
-				<Button variant="contained" onClick={this.handleDropClick}>- DROP</Button>
+				<Button variant="contained" size="small" onClick={this.handleDropClick}>- DROP</Button>
 			</Grid>
 		);
 	}
@@ -102,7 +78,7 @@ class AddNewBread extends React.Component {
 		return (
 			<Box m={1}>
 				<TextField id="standard-basic" label="New Bread Type" value={this.state.value} onChange={this.handleChange}/>
-				<Button variant="contained" onClick={this.handleClick}>+ ADD</Button>
+				<Button variant="contained" size="small" onClick={this.handleClick}>+ ADD</Button>
 			</Box>
 		);
 	}

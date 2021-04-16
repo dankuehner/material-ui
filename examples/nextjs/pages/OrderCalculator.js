@@ -2,11 +2,13 @@ import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
+import BreadSizeDisplay from './BreadSizeDisplay.js';
 
 function OrderCalculator(props) {
-	const ordersToMake = calculateOrdersToMake(props.orderList);
+	const allOrders = flattenOrderList(props.orderList);
+	const ordersToMake = calculateOrdersToMake(allOrders);
 	const unsatisfiedCustomers = getUnsatisfiedCustomers(props.orderList, ordersToMake);
-
+	
 	return (
 		<Box m={2}>
 			<Typography variant="h5" component="h5" gutterBottom>
@@ -15,7 +17,7 @@ function OrderCalculator(props) {
 			<Grid container spacing={1} m={2}>
 			{ordersToMake.map(order => (
 				<Grid item xs={12} key={order.id}>
-					Make a {order.breadType} {getSizeDisplay(order)} loaf for {order.customerName}.
+					Make a {order.breadType} <BreadSizeDisplay isRound={order.isRound} /> loaf for {order.customerName}.
 				</Grid>
 			))}
 			{unsatisfiedCustomers.map(customerName => (
@@ -28,8 +30,22 @@ function OrderCalculator(props) {
 	);
 }
 
-function getSizeDisplay(order) {
-	return order.isRound ? "round" : "pan";
+function flattenOrderList(orderList) {
+	var flatOrderList = [];
+	var currentIndex = 0;
+	
+	orderList.forEach((order) => {
+		order.lineItems.forEach((lineItem) => {
+			flatOrderList.push({
+				id: currentIndex++,
+				customerName: order.customerName,
+				breadType: lineItem.breadType,
+				isRound: lineItem.isRound
+			});
+		});
+	});
+	
+	return flatOrderList;
 }
 
 function calculateOrdersToMake(orderList) {
@@ -81,9 +97,6 @@ function findBestOrderCombination(orderCombinations) {
 	orderCombinations.forEach((combination) => {
 		const calculatedScore = calculateOrderCombinationScore(combination);
 		
-		console.log(combination);
-		console.log(calculatedScore);
-
 		if (isFirstScoreBetterThanSecond(calculatedScore, bestScore)) {
 			bestScore = calculatedScore;
 		}
